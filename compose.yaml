@@ -1,13 +1,12 @@
 services:
   postgres:
     image: postgres:17-alpine
-    container_name: spareparts-postgres
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "127.0.0.1:5432:5432"
+      - "127.0.0.1:${POSTGRES_PORT}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -22,11 +21,10 @@ services:
 
   mongodb:
     image: mongo:8
-    container_name: spareparts-mongodb
     environment:
       MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
     ports:
-      - "127.0.0.1:27017:27017"
+      - "127.0.0.1:${MONGO_PORT}:27017"
     volumes:
       - mongodb_data:/data/db
     healthcheck:
@@ -44,14 +42,13 @@ services:
 
   mariadb:
     image: mariadb:11.4
-    container_name: spareparts-mariadb
     environment:
       MARIADB_DATABASE: ${MARIADB_DATABASE}
       MARIADB_USER: ${MARIADB_USER}
       MARIADB_PASSWORD: ${MARIADB_PASSWORD}
       MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
     ports:
-      - "127.0.0.1:3307:3306"
+      - "127.0.0.1:${MARIADB_PORT}:3306"
     volumes:
       - mariadb_data:/var/lib/mysql
     healthcheck:
