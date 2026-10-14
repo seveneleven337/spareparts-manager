@@ -125,6 +125,34 @@ services:
       start_period: 10s
     restart: unless-stopped
 
+  employee-service:
+    build:
+      context: ./services/employee
+      dockerfile: Dockerfile
+    environment:
+      PORT: ${EMPLOYEE_SERVICE_PORT}
+      MARIADB_HOST: mariadb
+      MARIADB_CONTAINER_PORT: 3306
+      MARIADB_DATABASE: ${MARIADB_DATABASE}
+      MARIADB_USER: ${MARIADB_USER}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD}
+    ports:
+      - "127.0.0.1:${EMPLOYEE_SERVICE_PORT}:${EMPLOYEE_SERVICE_PORT}"
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:${EMPLOYEE_SERVICE_PORT}/health')"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
   gateway:
     build:
       context: ./services/gateway
