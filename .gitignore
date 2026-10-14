@@ -1,0 +1,53 @@
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Node.js
+node_modules/
+dist/
+build/
+coverage/
+
+# Electron build artifacts
+release/
+out/
+
+# IDEs
+.vscode/
+.idea/
+
+# Operating system
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Logs
+*.log
+npm-debug.log*
+
+# Local databases and runtime data
+*.db
+*.sqlite
+*.sqlite3
+data/
+
+# Test artifacts
+playwright-report/
+test-results/
