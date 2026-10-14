@@ -5,23 +5,31 @@ from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import SQLAlchemyError
 
-from app.database import check_database_connection, engine
+from app.api.routes.employees import router as employees_router
+from app.database import Base, check_database_connection, engine
+from app.models.employee import Employee  # noqa: F401
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Release database connections when the service stops."""
+    """Initialize the schema and release connections on shutdown."""
 
-    yield
-    engine.dispose()
+    Base.metadata.create_all(bind=engine)
+
+    try:
+        yield
+    finally:
+        engine.dispose()
 
 
 app = FastAPI(
     title="Employee Service",
     description="Manages employee data using MariaDB.",
-    version="0.1.0",
+    version="0.2.0",
     lifespan=lifespan,
 )
+
+app.include_router(employees_router)
 
 
 @app.get("/", tags=["Root"])
