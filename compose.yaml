@@ -161,12 +161,15 @@ services:
       GATEWAY_PORT: ${GATEWAY_PORT}
       PARTS_SERVICE_URL: http://parts-service:${PARTS_SERVICE_PORT}
       WAREHOUSE_SERVICE_URL: http://warehouse-service:${WAREHOUSE_SERVICE_PORT}
+      EMPLOYEE_SERVICE_URL: http://employee-service:${EMPLOYEE_SERVICE_PORT}
     ports:
       - "127.0.0.1:${GATEWAY_PORT}:${GATEWAY_PORT}"
     depends_on:
       parts-service:
         condition: service_healthy
       warehouse-service:
+        condition: service_healthy
+      employee-service:
         condition: service_healthy
     healthcheck:
       test:
