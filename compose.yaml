@@ -99,30 +99,6 @@ services:
       start_period: 10s
     restart: unless-stopped
 
-  gateway:
-    build:
-      context: ./services/gateway
-      dockerfile: Dockerfile
-    environment:
-      GATEWAY_PORT: ${GATEWAY_PORT}
-      PARTS_SERVICE_URL: http://parts-service:${PARTS_SERVICE_PORT}
-    ports:
-      - "127.0.0.1:${GATEWAY_PORT}:${GATEWAY_PORT}"
-    depends_on:
-      parts-service:
-        condition: service_healthy
-    healthcheck:
-      test:
-        - CMD
-        - python
-        - -c
-        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:${GATEWAY_PORT}/health')"
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
-    restart: unless-stopped
-
   warehouse-service:
     build:
       context: ./services/warehouse
@@ -132,8 +108,8 @@ services:
       MONGO_HOST: mongodb
       MONGO_PORT: 27017
       MONGO_DATABASE: ${MONGO_INITDB_DATABASE}
-    expose:
-      - "${WAREHOUSE_SERVICE_PORT}"
+    ports:
+      - "127.0.0.1:${WAREHOUSE_SERVICE_PORT}:${WAREHOUSE_SERVICE_PORT}"
     depends_on:
       mongodb:
         condition: service_healthy
@@ -143,6 +119,33 @@ services:
         - python
         - -c
         - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:${WAREHOUSE_SERVICE_PORT}/health')"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+  gateway:
+    build:
+      context: ./services/gateway
+      dockerfile: Dockerfile
+    environment:
+      GATEWAY_PORT: ${GATEWAY_PORT}
+      PARTS_SERVICE_URL: http://parts-service:${PARTS_SERVICE_PORT}
+      WAREHOUSE_SERVICE_URL: http://warehouse-service:${WAREHOUSE_SERVICE_PORT}
+    ports:
+      - "127.0.0.1:${GATEWAY_PORT}:${GATEWAY_PORT}"
+    depends_on:
+      parts-service:
+        condition: service_healthy
+      warehouse-service:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:${GATEWAY_PORT}/health')"
       interval: 10s
       timeout: 5s
       retries: 5
