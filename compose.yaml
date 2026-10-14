@@ -82,8 +82,8 @@ services:
       - 0.0.0.0
       - --port
       - "${PARTS_SERVICE_PORT}"
-    expose:
-      - "${PARTS_SERVICE_PORT}"
+    ports:
+      - "127.0.0.1:${PARTS_SERVICE_PORT}:${PARTS_SERVICE_PORT}"
     depends_on:
       postgres:
         condition: service_healthy

@@ -1,3 +1,4 @@
+
 from datetime import datetime
 
 from pydantic import (
@@ -36,10 +37,7 @@ class PartUpdate(BaseModel):
         max_length=150,
     )
     description: str | None = None
-    stock_quantity: int | None = Field(
-        default=None,
-        ge=0,
-    )
+    stock_quantity: int | None = Field(default=None, ge=0)
 
     @field_validator("name")
     @classmethod
@@ -57,9 +55,7 @@ class PartUpdate(BaseModel):
     @model_validator(mode="after")
     def validate_update(self):
         if not self.model_fields_set:
-            raise ValueError(
-                "At least one field must be provided."
-            )
+            raise ValueError("At least one field must be provided.")
 
         if "name" in self.model_fields_set and self.name is None:
             raise ValueError("Part name cannot be null.")
@@ -84,3 +80,12 @@ class PartResponse(BaseModel):
     stock_quantity: int
     created_at: datetime
     updated_at: datetime
+
+
+class PartListResponse(BaseModel):
+    """Paginated response containing spare parts."""
+
+    items: list[PartResponse]
+    total: int
+    limit: int
+    offset: int

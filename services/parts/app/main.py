@@ -4,14 +4,17 @@ from fastapi.responses import JSONResponse
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 
+from app.api.routes.parts import router as parts_router
 from app.database import engine
 
 
 app = FastAPI(
     title="Parts Service",
     description="Manages spare parts and inventory data.",
-    version="0.1.0",
+    version="0.2.0",
 )
+
+app.include_router(parts_router)
 
 
 @app.get("/", tags=["Root"])
