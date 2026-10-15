@@ -3,7 +3,7 @@ import os
 
 import httpx
 from fastapi import FastAPI, HTTPException, Request, Response
-from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 
 
 PARTS_SERVICE_URL = os.getenv(
@@ -40,6 +40,30 @@ app = FastAPI(
     title="SpareParts Manager API Gateway",
     description="Single entry point for the application's backend services.",
     version="0.4.0",
+)
+
+# Allow the local Next.js development server to call the API Gateway.
+# Add any additional frontend origins here if your setup requires them.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://172.20.10.2:3000",
+    ],
+    allow_credentials=False,
+    allow_methods=[
+        "GET",
+        "POST",
+        "PATCH",
+        "DELETE",
+        "OPTIONS",
+    ],
+    allow_headers=[
+        "Accept",
+        "Content-Type",
+        "Authorization",
+    ],
 )
 
 
@@ -104,7 +128,10 @@ async def forward_request(
         key: value
         for key, value in upstream_response.headers.items()
         if key.lower() not in HOP_BY_HOP_HEADERS
-        and key.lower() not in {"content-length", "content-encoding"}
+        and key.lower() not in {
+            "content-length",
+            "content-encoding",
+        }
     }
 
     return Response(
@@ -145,7 +172,10 @@ async def search_parts(request: Request) -> Response:
     methods=["GET", "PATCH", "DELETE"],
     tags=["Parts"],
 )
-async def part_by_id(part_id: int, request: Request) -> Response:
+async def part_by_id(
+    part_id: int,
+    request: Request,
+) -> Response:
     return await forward_request(
         PARTS_SERVICE_URL,
         f"/parts/{part_id}",
