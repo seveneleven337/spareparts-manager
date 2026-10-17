@@ -1,4 +1,3 @@
-
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -7,14 +6,20 @@ from pymongo.errors import PyMongoError
 
 from app.api.routes.warehouses import router as warehouses_router
 from app.database import check_database_connection, client
+from app.seeds.warehouse_seed import initialize_warehouse_seeds
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Release the MongoDB client when the service stops."""
+    """Initialize seed data and release the MongoDB client on shutdown."""
 
-    yield
-    client.close()
+    try:
+        check_database_connection()
+        initialize_warehouse_seeds()
+
+        yield
+    finally:
+        client.close()
 
 
 app = FastAPI(
