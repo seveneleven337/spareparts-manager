@@ -1,4 +1,3 @@
-
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -8,15 +7,18 @@ from sqlalchemy.exc import SQLAlchemyError
 from app.api.routes.employees import router as employees_router
 from app.database import Base, check_database_connection, engine
 from app.models.employee import Employee  # noqa: F401
+from app.seeds.employee_seed import initialize_employee_seeds
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Initialize the schema and release connections on shutdown."""
-
-    Base.metadata.create_all(bind=engine)
+    """Initialize the schema and seed initial employees."""
 
     try:
+        Base.metadata.create_all(bind=engine)
+
+        initialize_employee_seeds()
+
         yield
     finally:
         engine.dispose()
