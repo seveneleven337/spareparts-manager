@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
@@ -6,12 +7,25 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from app.api.routes.parts import router as parts_router
 from app.database import engine
+from app.seeds.part_seed import initialize_part_seeds
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Initialize seed data and release database resources on shutdown."""
+
+    try:
+        initialize_part_seeds()
+        yield
+    finally:
+        engine.dispose()
 
 
 app = FastAPI(
     title="Parts Service",
     description="Manages spare parts and inventory data.",
     version="0.2.0",
+    lifespan=lifespan,
 )
 
 app.include_router(parts_router)

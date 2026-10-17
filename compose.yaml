@@ -76,12 +76,11 @@ services:
       DATABASE_USER: ${POSTGRES_USER}
       DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
     command:
-      - uvicorn
-      - app.main:app
-      - --host
-      - 0.0.0.0
-      - --port
-      - "${PARTS_SERVICE_PORT}"
+      - sh
+      - -c
+      - |
+        alembic upgrade head &&
+        uvicorn app.main:app --host 0.0.0.0 --port "$${PORT}"
     ports:
       - "127.0.0.1:${PARTS_SERVICE_PORT}:${PARTS_SERVICE_PORT}"
     depends_on:
